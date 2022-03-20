@@ -1,7 +1,7 @@
 # keypresses
 Application to make key shortcut images 
 
-This application is made by Elusion
+This application is made by Elusien
 
 https://elusien.co.uk/shotcut/resources/index.html#section_18
 
