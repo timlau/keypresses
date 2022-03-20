@@ -608,6 +608,18 @@
         , processing_initiated = false
         , elements = [];
 
+      let keymap = {
+        "Control": "Ctrl",
+        "ArrowUp": "Up",
+        "ArrowDown": "Down",
+        "ArrowLeft": "Left",
+        "ArrowRight": "Right",
+        "PageUp": "PgUp",
+        "PageDown": "PgDn"
+      }
+
+      let mapped = "";
+
 
       //$(document).on('keydown', 'textarea', function(e) { // Can't use this as jQuery event does not handle REPEAT keystrokes correctly
 
@@ -616,8 +628,14 @@
         processing_initiated = false;
         if (e.repeat || e.key.toLowerCase() === 'meta') { return; }
 
-        keys.push(e.key);
-        textarea.value += e.key + ' ';
+        mapped = keymap[e.key]
+        if (mapped) {
+          keys.push(mapped);
+          textarea.value += mapped;
+        } else {
+          keys.push(e.key);
+          textarea.value += e.key + ' ';
+        }
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
