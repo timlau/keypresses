@@ -12,9 +12,10 @@ This repo is just to track the changes, I have made to it
 
 nodejs and npm must be installed
 
-´´´
+```bash
 git clone git@github.com:timlau/keypresses.git
 cd keypresses
 npm install
 npm start
-´´´
+```
+
