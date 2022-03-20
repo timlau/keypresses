@@ -1,739 +1,890 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <meta charset='utf-8'>
-    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <title>Keypresses</title>
-    <meta name='viewport' content='width=device-width, initial-scale=1'>
-    <meta	http-equiv="Content-Security-Policy"
-        content="default-src 'self';
+  <meta charset='utf-8'>
+  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <title>Keypresses</title>
+  <meta name='viewport' content='width=device-width, initial-scale=1'>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self';
               script-src 'self' 'unsafe-inline' ;
                style-src 'self' 'unsafe-inline' ;
                 font-src 'self' 			          ;
                  img-src 'self' data:
     ">
-  
-    <script src="jquery.min.js"></script>
 
-    <style id="style_root">
-        :root {
-          --bg-color             : #ffffaa; /*#eeeeee;*/
-          --keybd-bg-color       : #00ff00;
-          --keybd-bg-opacity     : 0.2;
-          --keybd-bg-color-rgba  : rgba(0, 0, 0, 0.2);
-          --keybd-border-color     : #000000;
-          --keybd-border-opacity   : 1.0;
-          --keybd-border-color-rgba: rgba(0, 0, 0, 1.0);
-          --key-bg-color         : #ffffff;
-          --key-bg-opacity       : 1.0;
-          --key-bg-color-rgba    : rgba(255, 255, 255, 1.0);
-          --font-color            : #000000;
-          --font-opacity          : 1.0;
-          --font-color-rgba       : rgba(0, 0, 0, 1,0);
-          --key-height            : 3;  /*2*/
-          --key-margin            : 0.2em;
-          --key-radius            : 4px;
-          --font-size             : 16px;
-          --font-style            : italic;
-          --font-weight           : bold;
-          --font-family           : 'Source Code Pro', monospace;
-          --keys-offset           : 30;
-          --keys-padding          : 0.2em;
-          --keys-align            : right;
-          --keybd-border-val      : solid 1px var(--keybd-border-color-rgba);
-          --keybd-border-width    : 0;
-          --png-width             : 1920;
-          --download-png          : no;
-          --insert-plus           : no;
-        }
+  <script src="jquery.min.js"></script>
 
-
-        html { background-color: var(--background-color); padding: 0.5em;}
-        body {
-          background-color: var(--bg-color);
-          margin          : 0 10px;
-          min-height      : 100%;
-        }
-
-        textarea {
-          font-family: var(--font-family);
-          width      : 80em;
-          height     : 1.5em;
-          line-height: 1.5;
-          font-weight: bold;
-        }
-        
-        #keys {
-          display         : inline-block;
-          background-color: var(--keybd-bg-color-rgba);
-          padding         : var(--keys-padding);
-          text-align      : var(--keys-align);
-          border          : var(--keybd-border-val);
-          border-width    : var(--keybd-border-width);
-          margin          : 0;
-        }
-        
-        #keys > i, #keys > b {
-          display         : inline-block;
-          line-height     : var(--key-height);
-          min-width       : 2em;
-          color           : var(--font-color-rgba);
-          cursor          : pointer;
-          padding         : 0 0.5em;
-          margin          : var(--key-margin);
-          height          : var(--key-height);
-          border          : 1px solid var(--keybd-border-color-rgba);
-          background-color: var(--key-bg-color-rgba);
-          border-radius   : var(--key-radius);
-          font-family     : var(--font-family);
-          font-size       : var(--font-size);
-          font-weight     : var(--font-weight);
-          font-style      : var(--font-style);
-          text-align      : center;
-        } 
-
-        #keys > b {
-          line-height  : 1.2;
-          min-width    : 1.2em;
-          width        : 1.2em;
-          height       : 1.2em;
-          border-radius: 50%;
-          padding      : 0;
-        }
-
-        table {
-          border-collapse: collapse;
-        }
-
-        th, td {
-          font-family     : var(--font-family);
-          border          : solid 1px black;
-          color           : black;
-          background-color: white;
-          padding         : 0.2em;
-        }
-
-        #save_restore {
-          display: flex;
-          flex-direction: row;
-          align-items: center;
-          justify-content: space-evenly;
-          margin: 0.5em 1em;
-        }
-
-        .tab-wrap {
-          transition: 0.3s box-shadow ease;
-          padding: 0.25em;
-          max-width: 100%;
-          display: flex;
-          flex-wrap: wrap;
-          position: relative;
-          list-style: none;
-          background-color: #fff;
-          margin: 40px;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-        }
-
-        .tab:checked:nth-of-type(1) ~ .tab__content:nth-of-type(1),
-        .tab:checked:nth-of-type(2) ~ .tab__content:nth-of-type(2),
-        .tab:checked:nth-of-type(3) ~ .tab__content:nth-of-type(3) {
-          transition: 0.2s transform ease;
-          position: relative;
-          top: 0;
-          z-index: 100;
-          transform: translateY(0px);
-          text-shadow: 0 0 0;
-        }
-
-        .tab + label {
-          box-shadow: 0 -1px 0 #eee inset;
-          border-radius: 12px 12px 0 0;
-          cursor: pointer;
-          display: block;
-          text-decoration: none;
-          color: #aaaa;
-          flex-grow: 2;
-          text-align: center;
-          background-color: #eeee;
-          user-select: none;
-          text-align: center;
-          transition: 0.3s background-color ease, 0.3s box-shadow ease;
-          box-sizing: border-box;
-          padding: 15px;
-          font-size: 1.2em;
-          height: 2em;
-
-        }
-
-        .tab:checked + label {
-          color: #ffffff;
-          background-color: #005500;
-        }
-
-        .tab { visibility: hidden;}
-
-        .tab__content {
-          padding: 10px 25px;
-          background-color: transparent;
-          position: absolute;
-          width: 100%;
-          z-index: -1;
-          left: 0;
-          transform: translateY(-9999px);
-          border-radius: 6px;
-        }  
-
-        h1            { color    : white; background-color: black; text-align: center; font-size: 1.3rem; padding: 0.1em; margin: 0.2em;}
-        kbd           { color    : white; background-color: black; text-align: center; display: inline-block; padding: 0 0.2em;}
-        #settings     { font-size: 0.8em; }
-        #introduction { font-size: 1.2em; }
-
-        /* From cssbuttons.io by @nikk7007 */
-        .button {
-        --color: #000000;
-        padding: 0.8em 1.7em;
-        background-color: transparent;
-        border-radius: .3em;
-        position: relative;
-        overflow: hidden;
-        cursor: pointer;
-        transition: .5s;
-        border: 1px solid;
-        font-family: inherit;
-        text-transform: uppercase;
-        font-weight: bold;
-        color: var(--color);
-        z-index: 1;
-        }
-
-        .button::before, .button::after {
-        content: '';
-        display: block;
-        width: 50px;
-        height: 50px;
-        transform: translate(-50%, -50%);
-        position: absolute;
-        border-radius: 50%;
-        z-index: -1;
-        background-color: var(--color);
-        transition: 1s ease;
-        }
-
-        .button::before {
-        top: -1em;
-        left: -1em;
-        }
-
-        .button::after {
-        left: calc(100% + 1em);
-        top: calc(100% + 1em);
-        }
-
-        .button:hover::before, .button:hover::after {
-        height: 410px;
-        width: 410px;
-        }
-
-        .button:hover {
-        color: #ffffff;
-        }
-
-        .button:active {
-        filter: brightness(.8);
-        }
+  <style id="style_root">
+    :root {
+      --bg-color: #ffffaa;
+      /*#eeeeee;*/
+      --keybd-bg-color: #00ff00;
+      --keybd-bg-opacity: 0.2;
+      --keybd-bg-color-rgba: rgba(0, 0, 0, 0.2);
+      --keybd-border-color: #000000;
+      --keybd-border-opacity: 1.0;
+      --keybd-border-color-rgba: rgba(0, 0, 0, 1.0);
+      --key-bg-color: #ffffff;
+      --key-bg-opacity: 1.0;
+      --key-bg-color-rgba: rgba(255, 255, 255, 1.0);
+      --font-color: #000000;
+      --font-opacity: 1.0;
+      --font-color-rgba: rgba(0, 0, 0, 1, 0);
+      --key-height: 3;
+      /*2*/
+      --key-margin: 0.2em;
+      --key-radius: 4px;
+      --font-size: 16px;
+      --font-style: italic;
+      --font-weight: bold;
+      --font-family: 'Source Code Pro', monospace;
+      --keys-offset: 30;
+      --keys-padding: 0.2em;
+      --keys-align: right;
+      --keybd-border-val: solid 1px var(--keybd-border-color-rgba);
+      --keybd-border-width: 0;
+      --png-width: 1920;
+      --download-png: no;
+      --insert-plus: no;
+    }
 
 
-    </style>
-    <script src="./html2canvas.min.js"></script>
+    html {
+      background-color: var(--background-color);
+      padding: 0.5em;
+    }
 
-        
+    body {
+      background-color: var(--bg-color);
+      margin: 0 10px;
+      min-height: 100%;
+    }
+
+    textarea {
+      font-family: var(--font-family);
+      width: 80em;
+      height: 1.5em;
+      line-height: 1.5;
+      font-weight: bold;
+    }
+
+    #keys {
+      display: inline-block;
+      background-color: var(--keybd-bg-color-rgba);
+      padding: var(--keys-padding);
+      text-align: var(--keys-align);
+      border: var(--keybd-border-val);
+      border-width: var(--keybd-border-width);
+      margin: 0;
+    }
+
+    #keys>i,
+    #keys>b {
+      display: inline-block;
+      line-height: var(--key-height);
+      min-width: 2em;
+      color: var(--font-color-rgba);
+      cursor: pointer;
+      padding: 0 0.5em;
+      margin: var(--key-margin);
+      height: var(--key-height);
+      border: 1px solid var(--keybd-border-color-rgba);
+      background-color: var(--key-bg-color-rgba);
+      border-radius: var(--key-radius);
+      font-family: var(--font-family);
+      font-size: var(--font-size);
+      font-weight: var(--font-weight);
+      font-style: var(--font-style);
+      text-align: center;
+    }
+
+    #keys>b {
+      line-height: 1.2;
+      min-width: 1.2em;
+      width: 1.2em;
+      height: 1.2em;
+      border-radius: 50%;
+      padding: 0;
+    }
+
+    table {
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      font-family: var(--font-family);
+      border: solid 1px black;
+      color: black;
+      background-color: white;
+      padding: 0.2em;
+    }
+
+    #save_restore {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-evenly;
+      margin: 0.5em 1em;
+    }
+
+    .tab-wrap {
+      transition: 0.3s box-shadow ease;
+      padding: 0.25em;
+      max-width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      position: relative;
+      list-style: none;
+      background-color: #fff;
+      margin: 40px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    }
+
+    .tab:checked:nth-of-type(1)~.tab__content:nth-of-type(1),
+    .tab:checked:nth-of-type(2)~.tab__content:nth-of-type(2),
+    .tab:checked:nth-of-type(3)~.tab__content:nth-of-type(3) {
+      transition: 0.2s transform ease;
+      position: relative;
+      top: 0;
+      z-index: 100;
+      transform: translateY(0px);
+      text-shadow: 0 0 0;
+    }
+
+    .tab+label {
+      box-shadow: 0 -1px 0 #eee inset;
+      border-radius: 12px 12px 0 0;
+      cursor: pointer;
+      display: block;
+      text-decoration: none;
+      color: #aaaa;
+      flex-grow: 2;
+      text-align: center;
+      background-color: #eeee;
+      user-select: none;
+      text-align: center;
+      transition: 0.3s background-color ease, 0.3s box-shadow ease;
+      box-sizing: border-box;
+      padding: 15px;
+      font-size: 1.2em;
+      height: 2em;
+
+    }
+
+    .tab:checked+label {
+      color: #ffffff;
+      background-color: #005500;
+    }
+
+    .tab {
+      visibility: hidden;
+    }
+
+    .tab__content {
+      padding: 10px 25px;
+      background-color: transparent;
+      position: absolute;
+      width: 100%;
+      z-index: -1;
+      left: 0;
+      transform: translateY(-9999px);
+      border-radius: 6px;
+    }
+
+    h1 {
+      color: white;
+      background-color: black;
+      text-align: center;
+      font-size: 1.3rem;
+      padding: 0.1em;
+      margin: 0.2em;
+    }
+
+    kbd {
+      color: white;
+      background-color: black;
+      text-align: center;
+      display: inline-block;
+      padding: 0 0.2em;
+    }
+
+    #settings {
+      font-size: 0.8em;
+    }
+
+    #introduction {
+      font-size: 1.2em;
+    }
+
+    /* From cssbuttons.io by @nikk7007 */
+    .button {
+      --color: #000000;
+      padding: 0.8em 1.7em;
+      background-color: transparent;
+      border-radius: .3em;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: .5s;
+      border: 1px solid;
+      font-family: inherit;
+      text-transform: uppercase;
+      font-weight: bold;
+      color: var(--color);
+      z-index: 1;
+    }
+
+    .button::before,
+    .button::after {
+      content: '';
+      display: block;
+      width: 50px;
+      height: 50px;
+      transform: translate(-50%, -50%);
+      position: absolute;
+      border-radius: 50%;
+      z-index: -1;
+      background-color: var(--color);
+      transition: 1s ease;
+    }
+
+    .button::before {
+      top: -1em;
+      left: -1em;
+    }
+
+    .button::after {
+      left: calc(100% + 1em);
+      top: calc(100% + 1em);
+    }
+
+    .button:hover::before,
+    .button:hover::after {
+      height: 410px;
+      width: 410px;
+    }
+
+    .button:hover {
+      color: #ffffff;
+    }
+
+    .button:active {
+      filter: brightness(.8);
+    }
+  </style>
+  <script src="./html2canvas.min.js"></script>
+
+
 </head>
+
 <body>
-    <h1>Utility to Display Keypresses Graphically (and Optionally Download a PNG Image)</h1>
-    <textarea id="keypressarea" placeholder=" Click here and press your keys (the graphical representation will appear below when you finish)" size="80"></textarea><br>
-    <div id="keys"></div>
+  <h1>Utility to Display Keypresses Graphically (and Optionally Download a PNG Image)</h1>
+  <textarea id="keypressarea"
+    placeholder=" Click here and press your keys (the graphical representation will appear below when you finish)"
+    size="80"></textarea><br>
+  <div id="keys"></div>
 
-    <div class="tab-wrap">
-      <input type="radio" id="tab1" name="tabGroup1" class="tab" checked>
-      <label for="tab1">Settings</label>
+  <div class="tab-wrap">
+    <input type="radio" id="tab1" name="tabGroup1" class="tab" checked>
+    <label for="tab1">Settings</label>
 
-      <input type="radio" id="tab2" name="tabGroup1" class="tab">
-      <label for="tab2">Parameter Descriptions</label>
-      
-      <input type="radio" id="tab3" name="tabGroup1" class="tab">
-      <label for="tab3">Help</label>
+    <input type="radio" id="tab2" name="tabGroup1" class="tab">
+    <label for="tab2">Parameter Descriptions</label>
 
-      <section class="tab__content">
-        <table id="settings">
-          <thead>
-            <tr><th>Parameter</th><th>Value</th><th>Parameter</th><th>Value</th></tr>
-          </thead>
-          <tbody id="params">
-            <tr><td>bg-color          </td><td><input name="bg-color"           type="color"  value="#eeeeee"></td></tr>
-            <tr><td>key-bg-color      </td><td><input name="key-bg-color"       type="color"  value="#ffffff"> opacity <input name="key-bg-opacity"       type="number" value="1.0"  min="0" max="1"   size="3" step="0.1"></td>
-                <td>font-color        </td><td><input name="font-color"         type="color"  value="#000000"> opacity <input name="font-opacity"         type="number" value="1.0"  min="0" max="1"   size="3" step="0.1"></td></tr>
-            <tr><td>keybd-bg-color    </td><td><input name="keybd-bg-color"     type="color"  value="#000000"> opacity <input name="keybd-bg-opacity"     type="number" value="0.2"  min="0" max="1"   size="3" step="0.1"></td>
-                <td>keybd-border-color</td><td><input name="keybd-border-color" type="color"  value="#000000"> opacity <input name="keybd-border-opacity" type="number" value="1.0"  min="0" max="1"   size="3" step="0.1"></td></tr>
-            <tr>
-              <td>keys-align    </td>
-              <td>
-                <input name="keys-align" type="radio"   value="left"          > Left
-                <input name="keys-align" type="radio"   value="center"        > Center
-                <input name="keys-align" type="radio"   value="right" checked > Right
-              </td>
-              <td>keybd-border?</td>
-              <td>
-                <input name="keybd-border" type="radio"   value="yes"         > Yes
-                <input name="keybd-border" type="radio"   value="no"  checked > No
-              </td>
-            </tr>
-            <tr><td>key-height (x)</td><td><input name="key-height" type="number" value="2"  min="1" max="10" size="3" step="0.1"                ></td>
-                <td>font-size (px)</td><td><input name="font-size"  type="number" value="16" min="1" max="99" size="3" step="1"   data-suffix="px"></td></tr>
-            <tr><td>font-weight</td>
-              <td>
-                <input name="font-weight" type="radio" value="normal"        > Normal
-                <input name="font-weight" type="radio" value="bold"   checked> Bold
-              </td>
-              <td>font-style         </td>
-              <td>
-                <input name="font-style" type="radio" value="normal" checked> Normal
-                <input name="font-style" type="radio" value="italic"        > Italic
-              </td>
-            </tr>
-            <tr><td>font-family      </td><td><input name="font-family"  type="text"   value="'Source Code Pro', monospace" size="40"                      ></td>
-                <td>key-margin (em)  </td><td><input name="key-margin"   type="number" value="0.2"  min="0" max="10"   size="3" step="0.1" data-suffix="em"></td></tr>
-            <tr><td>keys-padding (em)</td><td><input name="keys-padding" type="number" value="0.2"  min="0" max="10"   size="3" step="0.1" data-suffix="em"></td>
-                <td>keys-offset (px) </td><td><input name="keys-offset"  type="number" value="30"   min="0" max="9999" size="5" step="5"   data-suffix="px"></td></tr>
-            <tr><td>key-radius (px)  </td><td><input name="key-radius"   type="number" value="4"    min="0" max="9999" size="5" step="1"   data-suffix="px"></td>
-                <td>png-width (px)   </td><td><input name="png-width"    type="number" value="1920" min="0" max="9999" size="5" step="5"                   ></td></tr>
-            <tr><td>download png?    </td>
-              <td>
-                <input name="download-png" type="radio"   value="yes" checked> Yes
-                <input name="download-png" type="radio"   value="no"         > No
-              </td>
-              <td>insert '+' signs?</td>
-              <td>
-                <input name="insert-plus"  type="radio"   value="yes"        > Yes
-                <input name="insert-plus"  type="radio"   value="no"  checked> No
-              </td>
-            </tr>
-          </tbody>
-        </table>
+    <input type="radio" id="tab3" name="tabGroup1" class="tab">
+    <label for="tab3">Help</label>
 
-        <div id="save_restore"><button type="button" class="button" id="save">Save Parameters</button> <button type="button" class="button" id="restore">Restore Parameters</button></div>
-        
-      </section>
-            
-      <section id="parameter_descriptions" class="tab__content">
-        <h3>Parameter Descriptionss</h3>
-        <table>
-          <thead>
-            <tr><th>Option</th><th>Description</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>bg-color          </td><td>The background color of the app. This has no effect on the PNG images produced, which have a transparent background.</td></tr>
-            <tr><td>key-bg-color      </td><td>The background color of the keys themselves.</td></tr>
-            <tr><td>font-color        </td><td>The color of the font used to write the key names.</td></tr>
-            <tr><td>keybd-bg-color    </td><td>The background color of the "keyboard" i.e. the container that holds the keys.</td></tr>
-            <tr><td>keybd-border-color</td><td>The color of the 4 edges of the "keyboard".</td></tr>
-            <tr><td>keys-align	      </td><td>The alignment of the keys (left, center or right) with respect to the PNG image.</td></tr>
-            <tr><td>keybd-border      </td><td>Whether or not to draw a border around the "keyboard".</td></tr>
-            <tr><td>key-height        </td><td>The height of the keys, relative to the font-size (e.g. a height of 2 and font-size of 16px means the keys are 32px high).</td></tr>
-            <tr><td>font-size         </td><td>The size of the font used to write the names of the keys.</td></tr>
-            <tr><td>font-weight       </td><td>The weight of the font, normal or bold.</td></tr>
-            <tr><td>font-style        </td><td>The style of the font, normal or italic.</td></tr>
-            <tr><td>font-family       </td><td>The list of fonts that will be used to write the key names. If the 1st font does not exist it will use the 2nd etc...</td></tr>
-            <tr><td>key-margin        </td><td>The size of the margin, relative to font-size, between the Keys themselves and betwen the keys and the edges of the "keyboard".</td></tr>
-            <tr><td>keys-padding      </td><td>The padding between the edges of the "keyboard" and the key names.</td></tr>
-            <tr><td>keys-offset       </td><td>number of pixels between: the key and the left-hand edge of the PNG image for left-align, or the right-hand edge for right-align.</td></tr>
-            <tr><td>key-radius        </td><td>The radius in pixels of the 4 corners of each key.</td></tr>
-            <tr><td>png-width 	      </td><td>The width of the PNG image. If this parameter is 0 or negative, the PNG image will have the same width as the "keyboard".</td></tr>
-            <tr><td>download png      </td><td>Whether or not the PNG is to be downloaded and saved. Setting this to "No" can be useful for testing without creating the PNGs.</td></tr>
-            <tr><td>insert '+' signs  </td><td>Whether or not to insert a plust sign (+) between keys.</td></tr>
-          </tbody>
-        </table>
-        
-      </section>
+    <section class="tab__content">
+      <table id="settings">
+        <thead>
+          <tr>
+            <th>Parameter</th>
+            <th>Value</th>
+            <th>Parameter</th>
+            <th>Value</th>
+          </tr>
+        </thead>
+        <tbody id="params">
+          <tr>
+            <td>bg-color </td>
+            <td><input name="bg-color" type="color" value="#eeeeee"></td>
+          </tr>
+          <tr>
+            <td>key-bg-color </td>
+            <td><input name="key-bg-color" type="color" value="#ffffff"> opacity <input name="key-bg-opacity"
+                type="number" value="1.0" min="0" max="1" size="3" step="0.1"></td>
+            <td>font-color </td>
+            <td><input name="font-color" type="color" value="#000000"> opacity <input name="font-opacity" type="number"
+                value="1.0" min="0" max="1" size="3" step="0.1"></td>
+          </tr>
+          <tr>
+            <td>keybd-bg-color </td>
+            <td><input name="keybd-bg-color" type="color" value="#000000"> opacity <input name="keybd-bg-opacity"
+                type="number" value="0.2" min="0" max="1" size="3" step="0.1"></td>
+            <td>keybd-border-color</td>
+            <td><input name="keybd-border-color" type="color" value="#000000"> opacity <input
+                name="keybd-border-opacity" type="number" value="1.0" min="0" max="1" size="3" step="0.1"></td>
+          </tr>
+          <tr>
+            <td>keys-align </td>
+            <td>
+              <input name="keys-align" type="radio" value="left"> Left
+              <input name="keys-align" type="radio" value="center"> Center
+              <input name="keys-align" type="radio" value="right" checked> Right
+            </td>
+            <td>keybd-border?</td>
+            <td>
+              <input name="keybd-border" type="radio" value="yes"> Yes
+              <input name="keybd-border" type="radio" value="no" checked> No
+            </td>
+          </tr>
+          <tr>
+            <td>key-height (x)</td>
+            <td><input name="key-height" type="number" value="2" min="1" max="10" size="3" step="0.1"></td>
+            <td>font-size (px)</td>
+            <td><input name="font-size" type="number" value="16" min="1" max="99" size="3" step="1" data-suffix="px">
+            </td>
+          </tr>
+          <tr>
+            <td>font-weight</td>
+            <td>
+              <input name="font-weight" type="radio" value="normal"> Normal
+              <input name="font-weight" type="radio" value="bold" checked> Bold
+            </td>
+            <td>font-style </td>
+            <td>
+              <input name="font-style" type="radio" value="normal" checked> Normal
+              <input name="font-style" type="radio" value="italic"> Italic
+            </td>
+          </tr>
+          <tr>
+            <td>font-family </td>
+            <td><input name="font-family" type="text" value="'Source Code Pro', monospace" size="40"></td>
+            <td>key-margin (em) </td>
+            <td><input name="key-margin" type="number" value="0.2" min="0" max="10" size="3" step="0.1"
+                data-suffix="em"></td>
+          </tr>
+          <tr>
+            <td>keys-padding (em)</td>
+            <td><input name="keys-padding" type="number" value="0.2" min="0" max="10" size="3" step="0.1"
+                data-suffix="em"></td>
+            <td>keys-offset (px) </td>
+            <td><input name="keys-offset" type="number" value="30" min="0" max="9999" size="5" step="5"
+                data-suffix="px"></td>
+          </tr>
+          <tr>
+            <td>key-radius (px) </td>
+            <td><input name="key-radius" type="number" value="4" min="0" max="9999" size="5" step="1" data-suffix="px">
+            </td>
+            <td>png-width (px) </td>
+            <td><input name="png-width" type="number" value="1920" min="0" max="9999" size="5" step="5"></td>
+          </tr>
+          <tr>
+            <td>download png? </td>
+            <td>
+              <input name="download-png" type="radio" value="yes" checked> Yes
+              <input name="download-png" type="radio" value="no"> No
+            </td>
+            <td>insert '+' signs?</td>
+            <td>
+              <input name="insert-plus" type="radio" value="yes"> Yes
+              <input name="insert-plus" type="radio" value="no" checked> No
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-            
-      <section id="help" class="tab__content">
-        <h3>Introduction</h3>
+      <div id="save_restore"><button type="button" class="button" id="save">Save Parameters</button> <button
+          type="button" class="button" id="restore">Restore Parameters</button></div>
+
+    </section>
+
+    <section id="parameter_descriptions" class="tab__content">
+      <h3>Parameter Descriptionss</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Option</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>bg-color </td>
+            <td>The background color of the app. This has no effect on the PNG images produced, which have a transparent
+              background.</td>
+          </tr>
+          <tr>
+            <td>key-bg-color </td>
+            <td>The background color of the keys themselves.</td>
+          </tr>
+          <tr>
+            <td>font-color </td>
+            <td>The color of the font used to write the key names.</td>
+          </tr>
+          <tr>
+            <td>keybd-bg-color </td>
+            <td>The background color of the "keyboard" i.e. the container that holds the keys.</td>
+          </tr>
+          <tr>
+            <td>keybd-border-color</td>
+            <td>The color of the 4 edges of the "keyboard".</td>
+          </tr>
+          <tr>
+            <td>keys-align </td>
+            <td>The alignment of the keys (left, center or right) with respect to the PNG image.</td>
+          </tr>
+          <tr>
+            <td>keybd-border </td>
+            <td>Whether or not to draw a border around the "keyboard".</td>
+          </tr>
+          <tr>
+            <td>key-height </td>
+            <td>The height of the keys, relative to the font-size (e.g. a height of 2 and font-size of 16px means the
+              keys are 32px high).</td>
+          </tr>
+          <tr>
+            <td>font-size </td>
+            <td>The size of the font used to write the names of the keys.</td>
+          </tr>
+          <tr>
+            <td>font-weight </td>
+            <td>The weight of the font, normal or bold.</td>
+          </tr>
+          <tr>
+            <td>font-style </td>
+            <td>The style of the font, normal or italic.</td>
+          </tr>
+          <tr>
+            <td>font-family </td>
+            <td>The list of fonts that will be used to write the key names. If the 1st font does not exist it will use
+              the 2nd etc...</td>
+          </tr>
+          <tr>
+            <td>key-margin </td>
+            <td>The size of the margin, relative to font-size, between the Keys themselves and betwen the keys and the
+              edges of the "keyboard".</td>
+          </tr>
+          <tr>
+            <td>keys-padding </td>
+            <td>The padding between the edges of the "keyboard" and the key names.</td>
+          </tr>
+          <tr>
+            <td>keys-offset </td>
+            <td>number of pixels between: the key and the left-hand edge of the PNG image for left-align, or the
+              right-hand edge for right-align.</td>
+          </tr>
+          <tr>
+            <td>key-radius </td>
+            <td>The radius in pixels of the 4 corners of each key.</td>
+          </tr>
+          <tr>
+            <td>png-width </td>
+            <td>The width of the PNG image. If this parameter is 0 or negative, the PNG image will have the same width
+              as the "keyboard".</td>
+          </tr>
+          <tr>
+            <td>download png </td>
+            <td>Whether or not the PNG is to be downloaded and saved. Setting this to "No" can be useful for testing
+              without creating the PNGs.</td>
+          </tr>
+          <tr>
+            <td>insert '+' signs </td>
+            <td>Whether or not to insert a plust sign (+) between keys.</td>
+          </tr>
+        </tbody>
+      </table>
+
+    </section>
+
+
+    <section id="help" class="tab__content">
+      <h3>Introduction</h3>
+      <p>
+        This utility enables you to visualise graphically any keypresses that you make in the area at the top of the
+        page.
+        The visualisation is in the form of "keys" as you would see on a keyboard.
+        As you press a key it is remembered and once you lift your finger from the key
+        (or a set of keys such as <kbd>Control</kbd> <kbd>Alt</kbd> <kbd>x</kbd>) these keys are displayd.
+        Optionally, a PNG image with a transparent background is also downloaded at this point.
+        The image is useful if e.g. you are making a tutorial video with a video editor such as Shotcut and want edit in
+        the keypresses so they appear on
+        the screen.
+      </p>
+      <p>
+        There are various parameters that you can set to tailor how the keys appear e.g. if you want the keys to appear
+        30 pixels from the right-hand edge
+        of the image you would set "keys-align = right" and "keys-offset = 30".
+        By default the keys are displayed as a "keyboard" (kbd) with an opacity set to 0.2. If you just want the keys
+        and not the keyboard then set
+        "keybd-bg-color opacity = 0".
+        Click on the "Settings" tab at the left to set the parameters.
+      </p>
+      <p>
+        This utility does not access the internet and so can be run without an internet connection.
+      </p>
+      <h3>Copyright</h3>
+      <div class="copyright">
         <p>
-          This utility enables you to visualise graphically any keypresses that you make in the area at the top of the page.
-          The visualisation is in the form of "keys" as you would see on a keyboard.
-          As you press a key it is remembered and once you lift your finger from the key
-          (or a set of keys such as <kbd>Control</kbd> <kbd>Alt</kbd> <kbd>x</kbd>) these keys are displayd.
-          Optionally, a PNG image with a transparent background is also downloaded at this point.
-          The image is useful if e.g. you are making a tutorial video with a video editor such as Shotcut and want edit in the keypresses so they appear on
-          the screen.
+          Version 2.0 Copyright <sup>&copy; 2022 - Elusien Entertainment</sup> (<a href='https://www.elusien.co.uk'
+            target='_blank'>www.elusien.co.uk</a>)
         </p>
         <p>
-          There are various parameters that you can set to tailor how the keys appear e.g. if you want the keys to appear 30 pixels from the right-hand edge
-          of the image you would set "keys-align = right" and "keys-offset = 30".
-          By default the keys are displayed as a "keyboard" (kbd) with an opacity set to 0.2. If you just want the keys and not the keyboard then set 
-          "keybd-bg-color opacity = 0".
-          Click on the "Settings" tab at the left to set the parameters.
+          <a rel='license' href='http://creativecommons.org/licenses/by-sa/4.0/' target='_blank'>
+            <img alt='Creative Commons Licence' style='border-width:0' src='./CC_88x31.png' />
+          </a>
+          This work is licensed under a <a rel='license' href='http://creativecommons.org/licenses/by-sa/4.0/'
+            target='_blank'>
+            Creative Commons Attribution-ShareAlike 4.0 International License</a>.
         </p>
         <p>
-          This utility does not access the internet and so can be run without an internet connection.
+          The following is a summary of the license. For the actual wording of the license see:
+          <a href='https://creativecommons.org/licenses/by-sa/4.0/legalcode' target='_blank'>
+            https://creativecommons.org/licenses/by-sa/4.0/legalcode
+          </a>
         </p>
-        <h3>Copyright</h3>
-        <div class="copyright">
-          <p>
-              Version 2.0 Copyright <sup>&copy; 2022 - Elusien Entertainment</sup> (<a href='https://www.elusien.co.uk' target='_blank'>www.elusien.co.uk</a>)
-          </p>
-          <p>
-              <a rel='license' href='http://creativecommons.org/licenses/by-sa/4.0/' target='_blank'>
-                  <img alt='Creative Commons Licence' style='border-width:0' src='./CC_88x31.png' />
-              </a>
-              This work is licensed under a <a rel='license' href='http://creativecommons.org/licenses/by-sa/4.0/' target='_blank'>
-              Creative Commons Attribution-ShareAlike 4.0 International License</a>.
-          </p>
-          <p>
-              The following is a summary of the license. For the actual wording of the license see:
-              <a href='https://creativecommons.org/licenses/by-sa/4.0/legalcode' target='_blank'>
-                  https://creativecommons.org/licenses/by-sa/4.0/legalcode
-              </a>
-          </p>
-          <p>
-              <b>Attribution</b> — You must give appropriate credit, provide a link to the license,
-              and indicate if changes were made. You may do so in any reasonable manner,
-              but not in any way that suggests the licensor endorses you or your use.	
-          </p>
-          <p>
-              <b>ShareAlike</b> — If you remix, transform, or build upon the material, you must distribute
-              your contributions under the same license as the original.
-              
-          </p>
-          <p>
-              <b>No additional restrictions</b> — You may not apply legal terms or technological measures
-              that legally restrict others from doing anything the license permits.
-          </p>
-          <p>
-              <b>Notices</b>
-          </p>
-              <ul>
-                  <li>You do not have to comply with the license for elements of the material in the public domain
-                      or where your use is permitted by an applicable exception or limitation.
-                  </li>
-                  <li>
-                      No warranties are given. The license may not give you all of the permissions necessary
-                      for your intended use. For example, other rights such as publicity, privacy, or moral rights
-                      may limit how you use the material.
-                  </li>
-                  <li>
-                      The above copyright notice and this permission notice shall be included in
-                      all copies or substantial portions of the Software.			
-                  </li>
-                  <li>
-                      THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-                      IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-                      FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-                      AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-                      LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-                      OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-                      SOFTWARE.				
-                  </li>
-              </ul>
+        <p>
+          <b>Attribution</b> — You must give appropriate credit, provide a link to the license,
+          and indicate if changes were made. You may do so in any reasonable manner,
+          but not in any way that suggests the licensor endorses you or your use.
+        </p>
+        <p>
+          <b>ShareAlike</b> — If you remix, transform, or build upon the material, you must distribute
+          your contributions under the same license as the original.
+
+        </p>
+        <p>
+          <b>No additional restrictions</b> — You may not apply legal terms or technological measures
+          that legally restrict others from doing anything the license permits.
+        </p>
+        <p>
+          <b>Notices</b>
+        </p>
+        <ul>
+          <li>You do not have to comply with the license for elements of the material in the public domain
+            or where your use is permitted by an applicable exception or limitation.
+          </li>
+          <li>
+            No warranties are given. The license may not give you all of the permissions necessary
+            for your intended use. For example, other rights such as publicity, privacy, or moral rights
+            may limit how you use the material.
+          </li>
+          <li>
+            The above copyright notice and this permission notice shall be included in
+            all copies or substantial portions of the Software.
+          </li>
+          <li>
+            THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+            IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+            FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+            AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+            LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+            OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+            SOFTWARE.
+          </li>
+        </ul>
       </div>
-  
-      </section>
-    </div>
-<script>
-$(document).ready(function() {
-"use strict"
-const    DEBUG    = false
-        ,textarea = document.getElementById('keypressarea')
-        ,keyarea  = document.getElementById('keys')
-        ,logarea  = document.getElementById('logarea')
-        ,urlarea  = document.getElementById('url')
-        ,KEY_UP   = false
-        ,KEY_DOWN = true
-        ,root     = document.documentElement
-        ,css_vars = get_all_root_variables_from_stylesheet();
 
-let      key_sets             = [[], []]
-        ,key_set              = 0
-        ,keys                 = key_sets[key_set]
-        ,processing_initiated = false
-        ,elements             = [];
+    </section>
+  </div>
+  <script>
+    $(document).ready(function () {
+      "use strict"
+      const DEBUG = false
+        , textarea = document.getElementById('keypressarea')
+        , keyarea = document.getElementById('keys')
+        , logarea = document.getElementById('logarea')
+        , urlarea = document.getElementById('url')
+        , KEY_UP = false
+        , KEY_DOWN = true
+        , root = document.documentElement
+        , css_vars = get_all_root_variables_from_stylesheet();
+
+      let key_sets = [[], []]
+        , key_set = 0
+        , keys = key_sets[key_set]
+        , processing_initiated = false
+        , elements = [];
 
 
-  //$(document).on('keydown', 'textarea', function(e) { // Can't use this as jQuery event does not handle REPEAT keystrokes correctly
+      //$(document).on('keydown', 'textarea', function(e) { // Can't use this as jQuery event does not handle REPEAT keystrokes correctly
 
-  textarea.addEventListener('keydown', function(e) {
+      textarea.addEventListener('keydown', function (e) {
 
-    processing_initiated = false;
-    if (e.repeat || e.key.toLowerCase() === 'meta') { return; }
+        processing_initiated = false;
+        if (e.repeat || e.key.toLowerCase() === 'meta') { return; }
 
-    keys.push(e.key);
-    textarea.value += e.key + ' ';
-    e.preventDefault();
-    e.stopPropagation();
-    e.stopImmediatePropagation();
+        keys.push(e.key);
+        textarea.value += e.key + ' ';
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
 
-});
+      });
 
-textarea.addEventListener('keyup', (e) => {
-    if (processing_initiated) { return; }
-    processing_initiated = true;
-    let pkeys            = keys;
-    key_set              = (key_set + 1) % 2;    // Flips between 0 and 1
-    keys                 = key_sets[key_set];
-    textarea.value       = '';
-    
-    let filename = '';
-    let html     = '';
-    keyarea.innerHTML = '';
-    if (pkeys.length === 0) { keyarea.innerHTML = ''; }
+      textarea.addEventListener('keyup', (e) => {
+        if (processing_initiated) { return; }
+        processing_initiated = true;
+        let pkeys = keys;
+        key_set = (key_set + 1) % 2;    // Flips between 0 and 1
+        keys = key_sets[key_set];
+        textarea.value = '';
 
-    for (let i = 0; i < pkeys.length; i++) {
-        filename += (pkeys[i].length !== 1) ? (pkeys[i] + '_') : ( (/[A-Z\d]/i.test(pkeys[i])) ? (pkeys[i] + '_') : 'char_');
-        html += `<i>${pkeys[i]}</i>${((css_vars['--insert-plus'] === 'no') ? '&nbsp;' : '<b>+</b>')}`;
-    }
+        let filename = '';
+        let html = '';
+        keyarea.innerHTML = '';
+        if (pkeys.length === 0) { keyarea.innerHTML = ''; }
 
-    html = html.replace(/(<b>\+<\/b>$)|&nbsp;$/, '');
-    $(keyarea).html(html) 
+        for (let i = 0; i < pkeys.length; i++) {
+          filename += (pkeys[i].length !== 1) ? (pkeys[i] + '_') : ((/[A-Z\d]/i.test(pkeys[i])) ? (pkeys[i] + '_') : 'char_');
+          html += `<i>${pkeys[i]}</i>${((css_vars['--insert-plus'] === 'no') ? '&nbsp;' : '<b>+</b>')}`;
+        }
 
-    pkeys.length = 0;
+        html = html.replace(/(<b>\+<\/b>$)|&nbsp;$/, '');
+        $(keyarea).html(html)
 
-    if (css_vars['--download-png'] === 'no') { return; }
+        pkeys.length = 0;
 
-    filename = filename.slice(0, -1) + '.png';
-    let offset = +css_vars['--keys-offset'].replace(/px/, '');
-    switch (css_vars['--keys-align']) {
-      case 'right':  offset = css_vars['--png-width'] - keyarea.offsetWidth - offset; break;
-      case 'left' :  offset = -offset; break;
-      default     :  offset = 0;
-    }
+        if (css_vars['--download-png'] === 'no') { return; }
 
-    let h2c_options = (css_vars['--png-width'] > 0) ? {backgroundColor:null, width: css_vars['--png-width'], x: -offset}
-                                                    : {backgroundColor:null};
+        filename = filename.slice(0, -1) + '.png';
+        let offset = +css_vars['--keys-offset'].replace(/px/, '');
+        switch (css_vars['--keys-align']) {
+          case 'right': offset = css_vars['--png-width'] - keyarea.offsetWidth - offset; break;
+          case 'left': offset = -offset; break;
+          default: offset = 0;
+        }
 
-    html2canvas(keyarea, h2c_options).then((canvas) => {
-        const base64image = canvas.toDataURL("image/png");
-        const blob = dataURItoBlob(base64image);
-        downloadBlob(blob, filename);
+        let h2c_options = (css_vars['--png-width'] > 0) ? { backgroundColor: null, width: css_vars['--png-width'], x: -offset }
+          : { backgroundColor: null };
+
+        html2canvas(keyarea, h2c_options).then((canvas) => {
+          const base64image = canvas.toDataURL("image/png");
+          const blob = dataURItoBlob(base64image);
+          downloadBlob(blob, filename);
+        });
+
+      });
+
+      $('input').on('change', function () {
+
+        const $this = $(this),
+          value = $this.val(),
+          name = $this.attr('name'),
+          css_var = '--' + name,
+          suffix = $this.attr('data-suffix');
+
+        if (typeof suffix !== 'undefined') {
+          root.style.setProperty(css_var, value + suffix);
+          css_vars[css_var] = value + suffix;
+        } else {
+          root.style.setProperty(css_var, value);
+          css_vars[css_var] = value;
+
+          if (/-color$/.test(css_var)) { // For colors we may need to apply opacity to get an RGBA color
+            let css_var_root = css_var.replace(/-color$/, '');
+            if ((css_var_root + "-opacity") in css_vars) {
+              let name = css_var_root + '-color-rgba';
+              let rgbo = hexToRGBA(value, css_vars[css_var_root + '-opacity']);
+
+              root.style.setProperty(name, rgbo);
+              css_vars[name] = rgbo;
+            }
+          } else if (/-opacity$/.test(css_var)) {  // For opacities we may need to apply color to get an RGBA color
+            let css_var_root = css_var.replace(/-opacity$/, '');
+            if ((css_var_root + "-color") in css_vars) {
+              let name = css_var_root + '-color-rgba';
+              let rgbo = hexToRGBA(css_vars[css_var_root + '-color'], value);
+
+              root.style.setProperty(name, rgbo);
+              css_vars[name] = rgbo;
+            }
+          }
+        }
+
+      });
+
+      $('input[type="radio"]').on('click', function () {
+
+        const $this = $(this),
+          value = $this.val(),
+          css_var = '--' + $this.attr('name');
+
+
+        root.style.setProperty(css_var, value);
+        css_vars[css_var] = value;
+
+        switch (css_var) {
+          case '--keybd-border':
+            root.style.setProperty('--keybd-border-width', (value === "yes") ? '1px' : 0);
+            css_vars['--keybd-border-width'] = (value === "yes") ? '1px' : 0;
+            break;
+          case '--download-png':
+            root.style.setProperty('--download-png', value);
+            css_vars['--download-png'] = value;
+            break;
+          case '--insert-plus':
+            root.style.setProperty('--insert-plus', value);
+            css_vars['--insert-plus'] = value;
+            break;
+        }
+
+      });
+
+      function downloadBlob(blob, name = 'file.txt') {
+        // Convert your blob into a Blob URL (a special url that points to an object in the browser's memory)
+        const blobUrl = URL.createObjectURL(blob);
+
+        // Create a link element
+        const link = document.createElement("a");
+
+        // Set link's href to point to the Blob URL
+        link.href = blobUrl;
+        link.download = name;
+
+        // Append link to the body
+        document.body.appendChild(link);
+
+        // Dispatch click event on the link
+        // This is necessary as link.click() does not work on the latest firefox
+        link.dispatchEvent(
+          new MouseEvent('click', {
+            bubbles: true,
+            cancelable: true,
+            view: window
+          })
+        );
+
+        // Remove link from body
+        document.body.removeChild(link);
+        URL.revokeObjectURL(blobUrl);
+      }
+
+      function dataURItoBlob(dataURI) {
+        // convert base64 to raw binary data held in a string
+        // doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
+        var byteString = atob(dataURI.split(',')[1]);
+
+        // separate out the mime component
+        var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
+
+        // write the bytes of the string to an ArrayBuffer
+        var ab = new ArrayBuffer(byteString.length);
+
+        // create a view into the buffer
+        var ia = new Uint8Array(ab);
+
+        // set the bytes of the buffer to the correct values
+        for (var i = 0; i < byteString.length; i++) {
+          ia[i] = byteString.charCodeAt(i);
+        }
+
+        // write the ArrayBuffer to a blob, and you're done
+        var blob = new Blob([ab], { type: mimeString });
+        return blob;
+
+      }
+
+      function get_all_root_variables_from_stylesheet() {	// Does not return changed values, only the initial ones.
+        var declaration = document.styleSheets[0].cssRules[0];
+        var allVar = declaration.style.cssText.split(";");
+        if (DEBUG) console.log(allVar);
+        var result = {};
+        for (var i = 0; i < allVar.length; i++) {
+          var a = allVar[i].split(':');
+          if (a[0] != "") {
+            result[a[0].trim()] = a[1].trim();
+            if (DEBUG) console.log(`result[${a[0].trim()}] = ${a[1].trim()}`);
+          }
+        }
+
+        return result;
+      }
+
+      function set_input_parameter_values(css_vars) {
+
+        for (let [key, value] of Object.entries(css_vars)) {
+          let name = key.replace(/^--/, '');
+          let val = value.replace(/em$|px$/, '');
+          let $input = $(`input[name=${name}]`);
+
+          if ($input.length === 0) { continue; }
+
+          if ($input.eq(0).attr('type') === 'radio') {
+            $(`input[name=${name}][value="${val}"]`).trigger('click');
+          } else {
+            $input.val(val).trigger('change');
+          }
+        }
+
+      }
+
+      function hexToRGBA(h, opacity) {
+        let r = 0, g = 0, b = 0;
+
+        // 3 digits
+        if (h.length == 4) {
+          r = "0x" + h[1] + h[1];
+          g = "0x" + h[2] + h[2];
+          b = "0x" + h[3] + h[3];
+
+          // 6 digits
+        } else if (h.length == 7) {
+          r = "0x" + h[1] + h[2];
+          g = "0x" + h[3] + h[4];
+          b = "0x" + h[5] + h[6];
+        }
+
+        return "rgba(" + +r + "," + +g + "," + +b + "," + opacity + ")";
+      }
+
+      function hexToRGB(h) {
+        let r = 0, g = 0, b = 0;
+
+        // 3 digits
+        if (h.length == 4) {
+          r = "0x" + h[1] + h[1];
+          g = "0x" + h[2] + h[2];
+          b = "0x" + h[3] + h[3];
+
+          // 6 digits
+        } else if (h.length == 7) {
+          r = "0x" + h[1] + h[2];
+          g = "0x" + h[3] + h[4];
+          b = "0x" + h[5] + h[6];
+        }
+
+        return "rgb(" + +r + "," + +g + "," + +b + ")";
+      }
+
+      $('#save').on('click', function () {
+        // Put the css_vars object into storage
+        window.localStorage.setItem('Elusien_Keypresses_Parameters', JSON.stringify(css_vars));
+      });
+
+      $('#restore').on('click', function () {
+        // Retrieve the css_vars object from storage
+        let restored_params = localStorage.getItem('Elusien_Keypresses_Parameters');
+
+        if (restored_params !== null) {
+          restored_params = JSON.parse(restored_params);
+          for (const [key, value] of Object.entries(css_vars)) {
+            if (key in restored_params) { css_vars[key] = restored_params[key]; }
+          }
+        }
+        set_input_parameter_values(css_vars);
+      });
+
+      // We need to put this AFTER we define the 'change' and 'click' handlers, else they won't be called.
+
+      $('#restore').trigger('click');
+
+      textarea.focus();
+
     });
-
-});
-
-$('input').on('change', function() {
-
-  const $this   = $(this),
-        value   = $this.val(),
-        name    = $this.attr('name'),
-        css_var = '--' + name,
-        suffix  =        $this.attr('data-suffix');
-
-if (typeof suffix !== 'undefined') {
-  root.style.setProperty(css_var, value + suffix);
-  css_vars[css_var]             = value + suffix ;
-} else {
-  root.style.setProperty(css_var, value);
-  css_vars[css_var]             = value ;
-
-  if (/-color$/.test(css_var)){ // For colors we may need to apply opacity to get an RGBA color
-    let css_var_root = css_var.replace(/-color$/, '');
-    if ((css_var_root + "-opacity") in css_vars) {
-      let name = css_var_root + '-color-rgba';
-      let rgbo = hexToRGBA(value, css_vars[css_var_root + '-opacity']);
-
-      root.style.setProperty(name, rgbo);
-      css_vars[name]             = rgbo ;
-    }
-  } else if  (/-opacity$/.test(css_var)){  // For opacities we may need to apply color to get an RGBA color
-    let css_var_root = css_var.replace(/-opacity$/, '');
-    if ((css_var_root + "-color") in css_vars) {
-      let name = css_var_root + '-color-rgba';
-      let rgbo = hexToRGBA(css_vars[css_var_root + '-color'], value);
-
-      root.style.setProperty(name, rgbo);
-      css_vars[name]             = rgbo ;
-    }
-  }
-}
-
-});
-
-$('input[type="radio"]').on('click', function(){
-
-	const $this   = $(this), 
-        value   = $this.val(),
-        css_var = '--' + $this.attr('name');
-
-
-  root.style.setProperty(css_var, value);
-  css_vars[css_var]             = value;
-
-  switch (css_var) {
-    case '--keybd-border':
-                        root.style.setProperty('--keybd-border-width',   (value === "yes") ? '1px' : 0);
-                                      css_vars['--keybd-border-width'] = (value === "yes") ? '1px' : 0 ;
-                        break;
-    case '--download-png':
-                         root.style.setProperty('--download-png',   value);
-                                       css_vars['--download-png'] = value ;
-                        break;
-   case '--insert-plus':
-                         root.style.setProperty('--insert-plus',    value);
-                                       css_vars['--insert-plus']  = value ;
-                        break;
-  } 
-
-});
-
-function downloadBlob(blob, name = 'file.txt') {
-  // Convert your blob into a Blob URL (a special url that points to an object in the browser's memory)
-  const blobUrl = URL.createObjectURL(blob);
-
-  // Create a link element
-  const link = document.createElement("a");
-
-  // Set link's href to point to the Blob URL
-  link.href = blobUrl;
-  link.download = name;
-
-  // Append link to the body
-  document.body.appendChild(link);
-
-  // Dispatch click event on the link
-  // This is necessary as link.click() does not work on the latest firefox
-  link.dispatchEvent(
-    new MouseEvent('click', { 
-      bubbles: true, 
-      cancelable: true, 
-      view: window 
-    })
-  );
-
-  // Remove link from body
-  document.body.removeChild(link);
-  URL.revokeObjectURL(blobUrl);
-}
-
-function dataURItoBlob(dataURI) {
-  // convert base64 to raw binary data held in a string
-  // doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
-  var byteString = atob(dataURI.split(',')[1]);
-
-  // separate out the mime component
-  var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
-
-  // write the bytes of the string to an ArrayBuffer
-  var ab = new ArrayBuffer(byteString.length);
-
-  // create a view into the buffer
-  var ia = new Uint8Array(ab);
-
-  // set the bytes of the buffer to the correct values
-  for (var i = 0; i < byteString.length; i++) {
-      ia[i] = byteString.charCodeAt(i);
-  }
-
-  // write the ArrayBuffer to a blob, and you're done
-  var blob = new Blob([ab], {type: mimeString});
-  return blob;
-
-}
-
-function get_all_root_variables_from_stylesheet() {	// Does not return changed values, only the initial ones.
-	var declaration = document.styleSheets[0].cssRules[0];
-	var allVar = declaration.style.cssText.split(";");
-if (DEBUG) console.log(allVar);
-	var result = {};
-	for (var i = 0; i < allVar.length; i++) {
-	  var a = allVar[i].split(':');
-	  if (a[0] != "") {
-      result[a[0].trim()] = a[1].trim();
-if (DEBUG) console.log(`result[${a[0].trim()}] = ${a[1].trim()}`);
-    }
-	}
-
-	return result;
-}
-
-function set_input_parameter_values(css_vars) {
-
-  for (let [key, value] of Object.entries(css_vars)) {
-    let name = key.replace(/^--/, '');
-    let val  = value.replace(/em$|px$/, '');
-    let $input = $(`input[name=${name}]`);
-
-    if ($input.length === 0) { continue; }
-
-    if ($input.eq(0).attr('type') === 'radio') {
-      $(`input[name=${name}][value="${val}"]`).trigger('click');
-    } else {
-      $input.val(val).trigger('change');
-    }
-  }
-
-}
-
-function hexToRGBA(h, opacity) {
-  let r = 0, g = 0, b = 0;
-
-  // 3 digits
-  if (h.length == 4) {
-    r = "0x" + h[1] + h[1];
-    g = "0x" + h[2] + h[2];
-    b = "0x" + h[3] + h[3];
-
-  // 6 digits
-  } else if (h.length == 7) {
-    r = "0x" + h[1] + h[2];
-    g = "0x" + h[3] + h[4];
-    b = "0x" + h[5] + h[6];
-  }
-  
-  return "rgba(" + +r + "," + +g + "," + +b +"," + opacity + ")";
-}
-
-function hexToRGB(h) {
-  let r = 0, g = 0, b = 0;
-
-  // 3 digits
-  if (h.length == 4) {
-    r = "0x" + h[1] + h[1];
-    g = "0x" + h[2] + h[2];
-    b = "0x" + h[3] + h[3];
-
-  // 6 digits
-  } else if (h.length == 7) {
-    r = "0x" + h[1] + h[2];
-    g = "0x" + h[3] + h[4];
-    b = "0x" + h[5] + h[6];
-  }
-  
-  return "rgb("+ +r + "," + +g + "," + +b + ")";
-}
-
-$('#save').on('click', function(){
-// Put the css_vars object into storage
-  window.localStorage.setItem('Elusien_Keypresses_Parameters', JSON.stringify(css_vars));
-});
-
-$('#restore').on('click', function(){
-// Retrieve the css_vars object from storage
-let restored_params = localStorage.getItem('Elusien_Keypresses_Parameters');
-
-if (restored_params !== null) {
-  restored_params = JSON.parse(restored_params);
-  for (const [key, value]  of Object.entries(css_vars)) {
-    if (key in restored_params) { css_vars[key] = restored_params[key]; }
-  }
-}
-set_input_parameter_values(css_vars);
-});
-
-// We need to put this AFTER we define the 'change' and 'click' handlers, else they won't be called.
-
-$('#restore').trigger('click');
-
-textarea.focus();
-
-});
-</script>
+  </script>
 </body>
+
 </html>
